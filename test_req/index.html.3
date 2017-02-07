@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <title>Login</title>
+        <!-- jquery-ui css has to go ahead or custom tooltip style wont show -->
+        <link rel="stylesheet" href="scripts/jquery-ui-themes-1.12.1/themes/base/jquery-ui.css">
+        <link rel="stylesheet" type="text/css" href="style/main.css">
+        <link rel="stylesheet" type="text/css" href="style/login.css">
+        <script src="scripts/jquery-3.1.1.js"></script>
+        <script src="scripts/jquery-ui.js"></script>
+        <script src="scripts/login.js"></script>
+    </head>
+    <body>
+        <div id="root_container" class="flex_container">
+            <div id="content_wrapper">
+                <div id="header_container" class="flex_container">
+                    <div class="header_content active">Login</div>
+                    <div class="header_content">Register</div>
+                </div>
+                <div class="form_container login">
+                    <!-- TODO: Remove default error style for inputs and add custom -->
+                    <form>
+                        <div id="login_inputs" class="">
+                            <div id="login_inputs_cloak" class="hidden"></div>
+                            <div class="input_container login email">
+                                <div class="error_icon hidden flex_container login email" title="Invalid Email Address">!</div>
+                                <input type="email" id="email_field" class="input_field login" onclick="login_validtion('email', false)" placeholder="Email Address" title="Email Address">
+                            </div>
+                            <div class="input_container login password">
+                                <div class="error_icon hidden flex_container login password" title="Password Required">!</div>
+                                <input type="password" id="password_field" class="input_field login" onclick="login_validtion('password', false)" placeholder="Password" title="Password">
+                                <div id="show_pass_button" class="flex_container">show</div>
+                                <a href="forgot_password.html" target="_blank">
+                                    <div id="forgot_pass_icon" class="flex_container" title="Forgot Password">
+                                        <div id="forgot_pass_icon_circle" class="flex_container">?</div>
+                                    </div>
+                                </a>
+                            </div>
+                            <div class="input_container login">
+                                <input type="button" class="submit_button input_field login" value="Login" title="Login">
+                            </div>
+                        </div>
+                        <div id="register_inputs">
+                            <div id="register_inputs_cloak" class=""></div>
+                            <div class="input_container register">
+                                <input type="email" id="firstname_field" class="input_field register" placeholder="First Name" title="First Name">
+                            </div>
+                            <div class="input_container register">
+                                <input type="email" id="surname_field" class="input_field register" placeholder="Surname" title="Surname">
+                            </div>
+                            <div class="input_container register">
+                                <input type="email" id="email_address_field" class="input_field register" placeholder="Email Address" title="Email Address">
+                            </div>
+                            <div class="input_container register">
+                                <input type="email" id="password_field_register" class="input_field register" placeholder="Password" title="Password">
+                            </div>
+                            <div class="input_container register">
+                                <input type="email" id="password_repeat_field" class="input_field register" placeholder="Password Repeat" title="Password Repeat">
+                            </div>
+                            <div class="input_container register">
+                                <input type="button" class="submit_button input_field register" value="Login" title="Login">
+                            </div>
+                        </div>
+                    </form>
+            </div>
+        </div>
+    </body>
+</html>
