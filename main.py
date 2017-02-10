@@ -100,18 +100,21 @@ class HTTPClient(HTTPServer):
 
     def read_request(self, req):
         '''reads resuest, gets status line(method, uri), headers, and body'''
-        r = req.split("\r\n")
-        status_line = r[0].split(" ")
-        self.request_dict["status_line"] = {"method": status_line[0], "URI": status_line[1], "protocol": status_line[2]}
-        self.request_dict["headers"] = {}
+        try:
+            r = req.split("\r\n")
+            status_line = r[0].split(" ")
+            self.request_dict["status_line"] = {"method": status_line[0], "URI": status_line[1], "protocol": status_line[2]}
+            self.request_dict["headers"] = {}
 
-        i = 1
-        while r[i]:
-            h = r[i].split(": ")
-            self.request_dict["headers"][h[0]] = h[1]
-            i += 1
+            i = 1
+            while r[i]:
+                h = r[i].split(": ")
+                self.request_dict["headers"][h[0]] = h[1]
+                i += 1
 
-        self.request_dict["body"] = [r[i + 1:]]
+            self.request_dict["body"] = [r[i + 1:]]
+        except IndexError:
+            self.request_dict = False
 
 if __name__ == '__main__':
     HTTPServer()
