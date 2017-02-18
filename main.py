@@ -5,6 +5,7 @@ import socket
 import headers
 import threading
 from datetime import datetime
+from error_status_codes import StatusCodeErrors
 
 #BUG: Server only sending one file, e.g. sends index.html, but not test.css,
 #     doesn't even receive the request for any other files after first request
@@ -56,21 +57,26 @@ class HTTPClient(HTTPServer):
 
         request = self.client_sock.recv(HTTPServer.buff_size).decode("utf-8")
         print(request)
+        
         self.request_dict = {}
         self.read_request(request)
         response = self.create_response()
-        print(response)
 
         self.client_sock.send(response.encode("utf-8"))
         self.client_sock.close()
-        print("end")
 
     def create_response(self):
         '''Creates response for client based on contents of client request'''
         #TODO - Accept every method type, currently only accepts GET and HEAD
         #TODO - Workout "Content-type" header, right now its hardcoded to "text/html", "text/javascript" and "text/css"
         #TODO - Check that the "Content-type" of the file requested is part of the clients "Accepted-types" head
+
+        #returns error if request dict is empty
+        if not self.request_dict:
+            return StatusCodeErrors.get_response(400, HTTPServer.server_name)
+
         method = self.request_dict["status_line"]["method"]
+        error = 0
 
         if method == "GET" or method == "HEAD":
             try:
@@ -89,14 +95,11 @@ class HTTPClient(HTTPServer):
                        "Content-type: {}\r\nConnection: Closed\r\n\r\n{}".format(datetime.now(), HTTPServer.server_name, len(f), content_type, body)
 
             except IOError:
-                f = open("status_pages/404.html", "r").read()
-                resp = "HTTP/1.1 404 Not Found\r\nDate: {}\r\nServer: PythonWebServer/0.0\r\nContent-Length: {}\r\n"\
-                       "Content-type: text/html\r\nConnection: Closed\r\n\r\n{}".format(str(datetime.now()), len(f), f)
+                error = 404
         else:
-            f = open("status_pages/501.html", "r").read()
-            resp = "HTTP/1.1 501 Not Implemented\r\nDate: {}\r\nServer: PythonWebServer/0.0\r\nContent-Length: {}\r\n"\
-                   "Content-type: text/html\r\nConnection: Closed\r\n\r\n{}".format(str(datetime.now()), len(f), f)
-        return resp
+            error = 405
+
+        return resp if not error else StatusCodeErrors.get_response(error, HTTPServer.server_name)
 
     def read_request(self, req):
         '''reads resuest, gets status line(method, uri), headers, and body'''

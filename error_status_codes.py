@@ -27,13 +27,9 @@ class StatusCodeErrors:
 
         if valid == 0: self.invalid_status_code()
 
-        #e.g. client[404] = ["404 Page Not Found", "404.html"]
-        #BUG: pages and error codes are being mixed, e.g. 404 Not found is being paired with 418.html
-        #     may have something to do with the fact a dict keys do not stay in order
         client = {i:[StatusCodeErrors.client_msg[400 - i], str(i) + ".html"] for i in range(400, 418)}
         server = {i:[StatusCodeErrors.server_msg[500 - i], str(i) + ".html"] for i in range(500, 506)}
         client_server = {**client, **server}
-        print(client_server)
 
         page = open("{}/{}".format(StatusCodeErrors.status_pages_dir, client_server[status_code][1]), "r").read()
         return "HTTP/1.1 {}\r\n"\
@@ -44,10 +40,10 @@ class StatusCodeErrors:
                "{}".format(client_server[status_code][0], datetime.now(), server_name, len(page), page)
 
     def invalid_status_code(self, msg=""):
-        raise InvalidStatusCodeError("Status code must be client (400 - 417) or server (500 - 505) error status code. {}".format(msg))
+        raise InvalidStatusCodeError("Status code must be 400-417 or 500-505. {}".format(msg))
 
 class InvalidStatusCodeError(Exception):
     pass
 
 if __name__ == '__main__':
-    print(StatusCodeErrors.get_response(404, "PythonWebServer"))
+    print(StatusCodeErrors.get_response(503, "PythonWebServer"))
