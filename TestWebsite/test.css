@@ -1,9 +1,11 @@
 @font-face{
 	font-family: Quicksand-Regular;
-	src: url("Quicksand-Regular.otf");
+	src: url("Quicksand-Regular.ttf");
 }
 
 *{
+	font-family: "Times New Roman", Georgia, Serif;
+	font-size: 44px;
   	padding: 0;
   	margin: 0;
   	background-color: #000;
@@ -11,5 +13,5 @@
 }
 
 h1{
-	font-family: Quicksand-Regular;
+	font-family: "Quicksand-Regular";
 }
