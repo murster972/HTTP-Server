@@ -1,0 +1,13 @@
+#fonts
+font/collection::ttc
+application/x-font-opentype::otf,ttf
+application/font-woff::woff
+application/font-woff2::woff2
+
+#text
+text/text::txt,text
+text/html::html,htm
+text/css::css
+text/javascript::js
+
+#images

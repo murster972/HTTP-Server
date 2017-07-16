@@ -44,6 +44,3 @@ class StatusCodeErrors:
 
 class InvalidStatusCodeError(Exception):
     pass
-
-if __name__ == '__main__':
-    print(StatusCodeErrors.get_response(503, "PythonWebServer"))

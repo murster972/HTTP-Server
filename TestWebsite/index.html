@@ -1,17 +1,262 @@
-<!DOCTYPE>
+<!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="utf-8">
-        <title>Python Web Server - index.html</title>
-        <link rel="stylesheet" type="text/css" href="test.css">
-        <script src="test.js"></script>
-    </head>
-    <body>
-        <h1>Hello World!</h1>
-        <form action="test_form.py" method="post">
-            input one: <input type="text" name="input_one">
-            input two: <input type="text" name="input_two">
-            Submit: <input type="submit" value="submit">
-        </form>
-    </body>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,user-scalable=no,initial-scale=1">
+		<title>
+			Higher Art Essays
+		</title>
+		<link rel="stylesheet" type="text/css" href="stylesheets/main.css">
+		<script type="text/javascript" src="scripts/jquery-1.11.3.js"></script>
+		<script type="text/javascript" src="scripts/menu.js"></script>
+		<script type="text/javascript">
+			window.addEventListener("resize", resize, false);
+			window.addEventListener("load", resize, false);
+
+			function resize(){
+				if(window.innerWidth <= 690){
+					$("#main_container_center").width("98%");
+					$(".album_img").width("90%");
+				}
+
+				else{
+					$("#main_container_center").width("700px");
+					$(".album_img").width("auto");
+				}
+			}
+		</script>
+	</head>
+	<body>
+		<div id="nav_bar_container">
+			<div id="nav_dropdown_container">
+				<p id="nav_dropdown_txt">+</p>
+				<div id="nav_dropdown">
+					<div id="dropdown_v_center">
+						<p class="nav_item" id="st">Storm Thorgerson</p>
+						<p class="nav_item" id="nb">Neville Brody</p>
+						<p class="nav_item" id="js">Jenny Saville</p>
+						<p class="nav_item" id="sc">Stephen Conroy</p>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div id="header_container">
+			<p id="header_txt">Higher Art Essays</p>
+		</div>
+		<div id="main_container_center">
+			<div class="artist_container" id="storm">
+				<div class="artist_title">
+					<p class="title_txt">Storm Thorgerson</p>
+				</div>
+				<div class="artist_info">
+					<p class="info_txt">
+						-  Graphic designer<br>
+						-  Born 28th February 1974, Potter Bar, Middlesex<br>
+						-  Went to Cambridge Higher School for Boys<br>
+						-  Read english at Leicester University<br>
+						-  Aubrey Powell, declined to design an album for Pink Floyd, Thoregson Volunteered<br>
+						-  He later said "I had no idea what I was doing"<br>
+						-  Setup graphic art group, whos's specilsation was creative photgraphy<br>
+						-  Influneced by artists and photographers including May Ray, Picasso and Ansel Adams.<br>
+					</p>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Album 1 - SATURDAY SUPERHOUS/BIFFY CLYRO
+						</div>
+						<img src="images/sc_1.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							Focus point is the center of the alum cover, a man sitting down on a chair, he is facing us and wearing a suit, his heads on fire - this represents anger.<br>
+							To the right of this man is another man, with the same apperance, but he has an explosion of tears coming from his face - this represents grief.<br>
+							To the left of the man on fire is a man with the same apperance, but he has black bats circling above his head, a black snake wrapping its self around his neck and a black dog sitting to his left, the man also a has a smirk on his face - this represents sanity, the idea that people can live happily with their demons.<br>
+							background is a white wall with a diagram of a person hanging on it, and a staute leaning against it.<br>
+							This could suggest it's a doctors waiting room<br>
+							Only text in the CD is in the top right, it says "BIFFY CLYRO/SATURDAY SUPERHOUSE", it's all capitalised, sans-serif and bold enough to stand out but not take over the CD cover.<br>
+							Targerting people in their mid 20's.<br>
+							<br>
+							The band had recently suffered a berevment and the purpose of this cover was to represent three emottions: anger, grief and sanity<br>
+							Thorgerson has done this using creative photgraphy manipulated by the computer.<br>
+						</p>
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Album 2 - BIFFY CLYRO/PUZZLE
+						</div>
+						<img src="images/sc_2.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							The focus point is to the right hand side of the cover, it's a man sitting on a stool, he's facing to the left and hunched over with his hands on his head, he appears to be naked<br>
+							The man's made out of jiggsaw pieces and is missing one piece form his chest, this piece is on the ground next to the stool, it could represent his heart being 'stolen' by someone.<br>
+							The floor is old and wooden.<br>
+							In the background there's a green wall with a door tp the left of the wall.<br>
+							The door is open and a light blue light is coming through the door and is reflected on the floor<br>
+							Their is also two silhouettes at the doorway, as if they are about to leave<br>
+							The only text on the whole cover is at the top left, it says "BIFFY CLYRO/PUZZLE", it's capitalised, sans-serif, small - roughly 12px - meaning it stands out but dosnt take over the CD cover.<br>
+						</p>
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Album 3 - The Dark Side of the Moon, Pink Floyd
+						</div>
+						<img src="images/sc_4.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							No text on the CD cover<br>
+							Solid black background with one shape on it, A trianglaular prisim which is in the middle of the cover<br>
+							A white light is coming through the left hand side of the prisim, it splits into a spectrum of lights - ROYGBIV - and comes out the right hand side of the prisim.<br>
+							The cover is represents the band well, as it's very simplistic and the lights are very representive of the lights they use at their concerts<br>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="artist_container" id="neville">
+				<div class="artist_title">
+					<p class="title_txt">Neville Brody</p>
+				</div>
+				<div class="artist_info">
+					<p class="info_txt">
+						-  Brittish designer and art director<br>
+						-  Forefront of graphic design for over two decades<br>
+						-  Born 23rd April 1957, Southgate London<br>
+						-  Fine art foundation course at Hornsey College of Art, 1975<br>
+						-  Three year BA honours Degree in graphic design at London College of printing<br>
+						-  1977, punk rock was having a major effect on London life<br>
+						-  Had a great impact on Brody's work and motivation, it wasn't well recieved by his tutors<br>
+					</p>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Album 1 - The Bomb, Parliment (proposed album cover), Phonogram Records, 1985
+						</div>
+						<img src="images/nb_2.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							focus point is in the center of the cover which is a black lighting bolt on top of an orange coloured bomb shape.<br>
+							Next is a magnet shape - yellow with a black border - that sprawls across the cover from top-left, to the bottom and then back up to the top-right.<br>
+							Written with the magnet is "The Bomb", in blod, capitalised and black.<br>
+							In the bottom left and right hand side is two bomb shapes which say "P-FUNK" on them they are half black, half red, with the text coloured inverter on them<br>
+							At the top is a black rectangle, with the words "PARLIAMENT", it's all captialised<br>
+							Underneath this is "GREATEST HITS", which is bold and black.<br>
+							The background is a fady sandy colour, which makes it look like a ww2 propaganda poster.<br><br>
+							The function was to represent the name of this album<br>
+							Brody has done this by using a variety of shapes and a powerful cover<br>
+							It's been hand rendered and the style of this gives it an apperance of a propagand poster.<br>
+							I like the design of the cover<br>
+						</p>
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Albume 2 - Mambo Sun, The Bongos, Fetish Records, 1982
+						</div>
+						<img src="images/nb_1.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							The focus point is the top left which is the sun, it's bright white and has heat rays coming off it<br>
+							The next thing is on the right hand side off the cover, it's a head of a lady, it has very little detail, with a base mustadr yellow colour and the hair and facial features have an orange outline, she is also wearing sun glasses<br>
+							The next thing is the left hand side of the cover, it's a sort of jagged pattern - like leopard print - it takes up the full height of the album and the width takes up about half the album, the pattern shows that Brody was influenced by punk rock<br>
+							The text at the top says "BONGOS", it's capitalised serif and hand rendered, the colour of the text alternates between each letter. The text down the left hand sidde say "mambo sun", it's rotated at 90 degress to create a frame around the girl, it's lower case and serif.<br>
+							The text and sun sort of fade in togther so it's hard to see at a distance.<br>
+						</p>
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Album 3 - RAZOR'S EDGE, DEFUNKT, Hannibal Records, 1982
+						</div>
+						<img src="images/sc_3.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							The focus point is the text at the center of the top of the album that says "DEFUNKT", it's been flipped horizontly so each letter is back-to-front, it's white, bold, sans-serif and has marks on each letter that could be slashes from a knife and is all capitalised<br>
+							The next thing is the center of the album, it's a man's head - facing up -,the man appears to be lying on some form of fabric. There's not alot of detail in his face, block colours are used to add tone and texture to his features, half of his face is covered by a shaddow.<br>
+							At the bottom is an oval shape - black with a white border - with text in it, it says "RAZORS EDGE", it's all capitalised, sans-serif and yellow colourd, the shape looks like a razor.<br>
+						</p>
+					</div>
+				</div>
+			</div>
+			<div class="artist_container" id="jenny">
+				<div class="artist_title">
+					<p class="title_txt">Jenny Saville</p>
+				</div>
+				<div class="artist_info">
+					<p class="info_txt">
+						-  Born in 1970, Casmbridge<br>
+						-  English painter and leading young british artist<br>
+						-  Known for momumental image of woman, usually self portraits<br>
+						-  Gainded her degree at Glsgow school of Art, 1992<br>
+						-  Awarded 6 months scholarship to the university of Cincinnati<br>
+						-  studided at Slade School of Art, 1992 to 1993<br>
+						-  Her works be compared to that of Rubans and Lucian Feud<br>
+						-  Greatests influences are Francis bacon and Willem de Koonig<br>
+					</p>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Reverse, 2003, oil on canvas
+						</div>
+						<img src="images/js_1.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Bleach, 2008, oil on canvas
+						</div>
+						<img src="images/js_2.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Read state hare i, 2007 - 2011, oil on canvas
+						</div>
+						<img src="images/js_3.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							
+					</div>
+				</div>
+			</div>
+			<div class="artist_container" id="stephen">
+				<div class="artist_title">
+					<p class="title_txt">Stephen Conroy</p>
+				</div>
+				<div class="artist_info">
+					<p class="info_txt">
+						-  Born in Helensburgh, Scotland 1964<br>
+						-  Studied at Glasgow school of art, 1982 to 1987<br>
+						-  Influenced by his father, a welder in a Glasow shipyard<br>
+						-  His works been included iin the Vigorous Imagination, at the Scottish National Gallery of modern art<br>
+						-  noted for drawing elusive figures in formal posses<br>
+						-  given close attein to the works of the Italian Renaissance, Goya and Dyck<br>
+					</p>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							JK V1, 2007, oil on canvas
+						</div>
+						<img src="images/sce_1.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							The background of the paiting is a very light pink<br>
+							The foreground of the painting is a man looking up, which takes up the majority of the painting<br>
+							The focal point of the paiting is the bottom of the mans nose<br>
+							The colours used in the paiting are all warm colours, and are stronger in the mans face than they are in the background, this makes the mans face more dominant<br>
+							The tone on the mans left hand side are lgihter and the right hand side is darker creating a shaddow effect and suggests artifical lighting - yellow/orange light - is coming from the left hand side of the paiting.<br>
+							There are brush strokes clearly visible, this helps to add more drama to the face, drawing more attention to it.<br>
+							The painting has a mysterious mood, because the man in the paiting is looking up to his left, it's as if he's something really strange/interesting<br>
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Self Portait, On the Phone, 2007, oil in canvas
+						</div>
+						<img src="images/sce_2.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							The focal point of the paiting is the mans face<br>
+							The background of the paiting is a warm light pink colour<br>
+							The foreground of the painting is a man - Stephen Conroy - on the phone with a finger in his ear, and a phone at the other ear<br>
+							There is a white figure of the man coming out of his left side, this could represent how frustrated and annoyed he is, like he just wants to escape from reality<br>
+							The clothes he are wearing - a suit and black jacket - have very little detail in them, this draws more attetion to his face<br>
+							The colours used in the mans face a very realistic, the tones in his face hel to capture the expression on the mans face - like the lines in his forehead, help show how fustrated he is<br>
+							The light pink background contrats with the man in the foregorund<br>
+					</div>
+					<div class="album_container">
+						<div class="info_txt album_title">
+							Sir James Ruciman, 1989 - 1990, oil on canvas
+						</div>
+						<img src="images/sce_3.jpg" class="album_img">
+						<p class="info_txt album_txt">
+							
+					</div>
+				</div>
+			</div>
+		</div>
+	</body>
 </html>
