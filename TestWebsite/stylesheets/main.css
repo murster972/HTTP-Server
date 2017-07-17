@@ -1,6 +1,6 @@
 @font-face {
     font-family: Quicksand;
-    src: url("fonts/Quicksand-Regular.otf");
+    src: url("fonts/Quicksand-Regular.woff");
 }
 
 @font-face {
@@ -44,7 +44,7 @@ body{
 }
 
 #nav_dropdown_txt{
-	font-family: Firasans;
+	font-family: Quicksand;
 	font-size: 30px;
 	text-align: center;
 }
@@ -74,7 +74,7 @@ body{
 }
 
 .nav_item{
-	font-family: Firasans;
+	font-family: Quicksand;
 	font-size: 30px;
 	color: #fff;
 	text-align: center;
@@ -99,7 +99,7 @@ body{
 }
 
 #header_txt{
-	font-family: Firasans;
+	font-family: Quicksand;
 	font-size: 40px;
 	text-align: center;
 	color: #fff;

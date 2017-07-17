@@ -1,7 +1,7 @@
 #fonts
 font/collection::ttc
 application/x-font-opentype::otf,ttf
-application/font-woff::woff
+application/x-font-woff::woff
 application/font-woff2::woff2
 
 #text

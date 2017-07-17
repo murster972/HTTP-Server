@@ -3,11 +3,14 @@ import os
 import sys
 import socket
 import base64
+import zlib
 from threading import Thread
-from status_codes import HTTPStatusCodes
+from status_codes import ErrorStatusCodes
 
 #NOTE: Font files are sending but are not being decoded by browser
 #TODO: Fix this^ shit
+#      The problem may be with the font being in base64, try compressing
+#      with gzip first
 
 class HTTPServer:
     clients = {}
@@ -115,6 +118,7 @@ class ClientHandler(HTTPServer):
                 if uri[0] == "/": uri = uri[1:]
 
                 ext = uri.split(".")
+                #changes any unknown or invalid ext to txt
                 ext = "txt" if len(ext) == 0 or not ext[-1] else ext[-1]
 
 
@@ -127,29 +131,46 @@ class ClientHandler(HTTPServer):
                 #NOTE: Problem will occur as different binary files use different encoding
                 #TODO: Find way to detect encoding
                 f_data = f.read()
+                headers = []
 
                 if r_opt == "rb":
-                    f_data = base64.b64encode(f_data)
-                    f_data = str(f_data)[2:-1]
+                    #NOTE: Trying to figure out how to compress font and send
+                    #f_data = base64.b64encode(f_data)
+                    f_data = zlib.compress(f_data)
+
+                    #f_data = base64.b64encode(f_data)
+
+                    #NOTE: Does not check if client accepts gzip encoding yet
+
+                    #NOTE: Content-Encoding header causing font to fail
+                    #headers.append("Content-Encoding: deflate")
+                    headers.append("Accept-Ranges: bytes")
+                    headers.append("Vary: Accept-Encoding")
+                    #f_data = str(f_data)[2:-1]
+
+                f.close()
 
                 content_length = len(f_data)
+                #f_data = f_data if r_opt == "r" else str(f_data)[2:-1]
 
                 #NOTE: ONLY FOR TESTING PURPOSES
                 if ext not in HTTPServer.content_types: ext = "txt"
                 content_type = "content-type: {}".format(HTTPServer.content_types[ext])
                 content_length = "content-length: {}".format(content_length)
-                #connect = "Connection: {}".format("Keep-alive" if headers["Connection"] == "keep-alive" else "Closed")
+                connect = "Connection: {}".format("Keep-alive" if self.req_headers["Connection"] == "keep-alive" else "Closed")
                 connect = "Connection: Closed"
-                headers = [content_type, content_length, connect]
+                headers += [content_type, content_length, connect]
 
                 #TODO: Change so http ver isnt hard coded
                 return self.gen_response("HTTP/1.1 200 OK", headers, f_data)
 
             except FileNotFoundError:
-                return HTTPStatusCodes.gen_status_code_page(404)
+                r = ErrorStatusCodes.gen_status_code_page(404)
+                return self.gen_response(r[0], r[1], r[2])
             #except (PermissionError, UnicodeDecodeError):
             except (PermissionError):
-                return HTTPStatusCodes.gen_status_code_page(403)
+                r = HTTPStatusCodes.gen_status_code_page(403)
+                return self.gen_response(r[0], r[1], r[2])
 
         elif method == "POST":
             pass
