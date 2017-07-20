@@ -68,6 +68,36 @@ class HTTPServer:
     def get_encoding(self):
         pass
 
+    'Translates any unicode chars to ascii in uri'
+    def uri_decoder(self, u):
+        new_u = ""
+        l_u = len(u)
+
+        #NOTE: currently only converts reserved chars and returns the uri as invalid if non reserved are in unicode
+        r_chars = "21 23 24 26 27 28 29 2A 2B 2C 2F 3A 3B 3D 3F 40 5B 5D".split()
+        r_chars_vals = "! # $ & ' ( ) * + , / : ; = ? @ [ ]".split()
+        r_chars_dict = {r_chars[i]:r_chars_vals[i] for i in range(len(r_chars))}
+
+        i = 0
+        while i < l_u:
+            if u[i] == "%" and i + 2 > l_u: return -1
+            if u[i] == "%":
+                uni = u[i+1:i+3]
+                if uni not in r_chars_dict: return -1
+                new_u += r_chars_dict[uni]
+                i += 3
+                continue
+            new_u += u[i]
+            i += 1
+
+    'Checks if uri passed is valid'
+    def is_valid_uri(self, u):
+        uri = self.uri_decoder(u)
+
+        if uri == -1: return -1
+
+        
+
 class ClientHandler(HTTPServer):
     def __init__(self, sock, addr):
         HTTPServer.clients[sock] = addr
