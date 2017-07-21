@@ -80,15 +80,15 @@ class HTTPServer:
 
         i = 0
         while i < l_u:
-            if u[i] == "%" and i + 2 > l_u: return -1
             if u[i] == "%":
-                uni = chr(int(u[i+1:i+3], 16))
-                if uni not in valid_chars: return -1
-                new_u += uni
+                if i + 2 > l_u: return -1
+                d = chr(int(u[i+1:i+3], 16))
+                if d not in valid_chars: return -1
+                new_u += d
                 i += 3
-                continue
-            new_u += u[i]
-            i += 1
+            else:
+                new_u += u[i]
+                i += 1
 
         return new_u
 
