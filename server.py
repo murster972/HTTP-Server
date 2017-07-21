@@ -29,6 +29,9 @@ class HTTPServer:
             print("[-] Invalid sever IP address or port number.")
             sys.exit(-1)
 
+        print(self.uri_decoder("helo%61world"))
+        exit()
+
         self.get_content_types()
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -68,35 +71,34 @@ class HTTPServer:
     def get_encoding(self):
         pass
 
-    'Translates any unicode chars to ascii in uri'
+    'Translates any unicode chars to ascii in uri, currently only supports UTF-8'
     def uri_decoder(self, u):
         new_u = ""
         l_u = len(u)
 
         #NOTE: currently only converts reserved chars and returns the uri as invalid if non reserved are in unicode
-        r_chars = "21 23 24 26 27 28 29 2A 2B 2C 2F 3A 3B 3D 3F 40 5B 5D".split()
-        r_chars_vals = "! # $ & ' ( ) * + , / : ; = ? @ [ ]".split()
-        r_chars_dict = {r_chars[i]:r_chars_vals[i] for i in range(len(r_chars))}
+        valid_chars = "! # $ & ' ( ) * + , / : ; = ? @ [ ] a".split()
+        valid_chars.append(" ")
 
         i = 0
         while i < l_u:
             if u[i] == "%" and i + 2 > l_u: return -1
             if u[i] == "%":
-                uni = u[i+1:i+3]
-                if uni not in r_chars_dict: return -1
-                new_u += r_chars_dict[uni]
+                uni = chr(int(u[i+1:i+3], 16))
+                if uni not in valid_chars: return -1
+                new_u += uni
                 i += 3
                 continue
             new_u += u[i]
             i += 1
+
+        return new_u
 
     'Checks if uri passed is valid'
     def is_valid_uri(self, u):
         uri = self.uri_decoder(u)
 
         if uri == -1: return -1
-
-        
 
 class ClientHandler(HTTPServer):
     def __init__(self, sock, addr):
