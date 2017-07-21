@@ -76,9 +76,7 @@ class HTTPServer:
         new_u = ""
         l_u = len(u)
 
-        #NOTE: currently only converts reserved chars and returns the uri as invalid if non reserved are in unicode
-        valid_chars = "! # $ & ' ( ) * + , / : ; = ? @ [ ] a".split()
-        valid_chars.append(" ")
+        valid_chars = [chr(i) for i in range(32, 127)]
 
         i = 0
         while i < l_u:
