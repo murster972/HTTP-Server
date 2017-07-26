@@ -23,7 +23,7 @@ class ErrorStatusCodes:
 
     'Returns status line, headers and body for an error status code'
     def get_status_code_page(status_code):
-        if not istype(status_code, int):
+        if type(status_code) is not int:
             raise Exception("Invalid Status Code.")
 
         if int(status_code) not in ErrorStatusCodes.status_codes:
@@ -33,7 +33,7 @@ class ErrorStatusCodes:
         body = f.read()
         f.close()
 
-        status_line = "HTTP/1.1 {} {}".format(status_code, ErrorStatusCodes.status_codes[status_code])
+        status_line = "HTTP/1.1 {} {}".format(status_code,  ErrorStatusCodes.status_codes[status_code][0])
         headers = ["Connection: Closed", "Content-Length: {}".format(len(body)), "Content-Type: text/html"]
 
         return [status_line, headers, body]

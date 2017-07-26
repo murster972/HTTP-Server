@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import os
+import re
 import sys
 import socket
 import base64
@@ -11,6 +12,7 @@ from status_codes import ErrorStatusCodes
 #TODO: Fix this^ shit
 #      The problem may be with the font being in base64, try compressing
 #      with gzip first
+#NOTE: Server is someone sending the reply of the clients last request back to its self
 
 class HTTPServer:
     clients = {}
@@ -29,8 +31,10 @@ class HTTPServer:
             print("[-] Invalid sever IP address or port number.")
             sys.exit(-1)
 
-        print(self.uri_decoder("helo%61world"))
-        exit()
+        self.valid_chars = [chr(i) for i in range(32, 127)]
+
+        #print(self.is_valid_uri("helo%61world"))
+        #exit()
 
         self.get_content_types()
 
@@ -76,14 +80,12 @@ class HTTPServer:
         new_u = ""
         l_u = len(u)
 
-        valid_chars = [chr(i) for i in range(32, 127)]
-
         i = 0
         while i < l_u:
             if u[i] == "%":
                 if i + 2 > l_u: return -1
                 d = chr(int(u[i+1:i+3], 16))
-                if d not in valid_chars: return -1
+                if d not in sefl.valid_chars: return -1
                 new_u += d
                 i += 3
             else:
@@ -94,9 +96,13 @@ class HTTPServer:
 
     'Checks if uri passed is valid'
     def is_valid_uri(self, u):
-        uri = self.uri_decoder(u)
+        #checks are chars are valid - no reserved chars in uri that arent encoded
+        v = re.sub("[^?#&]", self.valid_chars)
 
+        uri = self.uri_decoder(u)
         if uri == -1: return -1
+
+        #remove any attempts of backwards traversal
 
 class ClientHandler(HTTPServer):
     def __init__(self, sock, addr):
@@ -109,6 +115,16 @@ class ClientHandler(HTTPServer):
                 #recieves client requets
                 req = sock.recv(HTTPServer.BUFF_SIZE).decode()
 
+                #NOTE: CLient is sedning back a msg to the server at the end witht the status code
+                #      of 200 if the client recueved everything ok and an error code if not,
+                #      shoudl this happen?, is the client suppose to send this msg at the end?
+                #
+                #      A shitty hack to ignore msg at end, need to figure out if msg is suppose to be
+                #      sent by client
+                print(req)
+                if len(req.split("\r\n")[0].split()) != 3: break
+
+                #print(req)
                 resp = self.handle_request(req)
                 if not resp:
                     break
@@ -166,17 +182,18 @@ class ClientHandler(HTTPServer):
                 if r_opt == "rb":
                     #NOTE: Trying to figure out how to compress font and send
                     #f_data = base64.b64encode(f_data)
-                    f_data = zlib.compress(f_data)
+                    #f_data = zlib.compress(f_data)
 
-                    #f_data = base64.b64encode(f_data)
+                    #f_data = str(base64.b64encode(f_data))[2:-1]
 
                     #NOTE: Does not check if client accepts gzip encoding yet
 
                     #NOTE: Content-Encoding header causing font to fail
-                    #headers.append("Content-Encoding: deflate")
                     headers.append("Accept-Ranges: bytes")
-                    headers.append("Vary: Accept-Encoding")
-                    #f_data = str(f_data)[2:-1]
+                    #20248
+                    #headers.append("Content-Range: bytes 1/")
+                    #f_data = str(f_data)[2:-1
+                    f_data = f_data
 
                 f.close()
 
@@ -187,15 +204,16 @@ class ClientHandler(HTTPServer):
                 if ext not in HTTPServer.content_types: ext = "txt"
                 content_type = "content-type: {}".format(HTTPServer.content_types[ext])
                 content_length = "content-length: {}".format(content_length)
-                connect = "Connection: {}".format("Keep-alive" if self.req_headers["Connection"] == "keep-alive" else "Closed")
+                #connect = "Connection: {}".format("Keep-alive" if self.req_headers["Connection"] == "keep-alive" else "Closed")
                 connect = "Connection: Closed"
                 headers += [content_type, content_length, connect]
 
                 #TODO: Change so http ver isnt hard coded
+                f_data = "" if method == "HEAD" else f_data
                 return self.gen_response("HTTP/1.1 200 OK", headers, f_data)
 
             except FileNotFoundError:
-                r = ErrorStatusCodes.gen_status_code_page(404)
+                r = ErrorStatusCodes.get_status_code_page(404)
                 return self.gen_response(r[0], r[1], r[2])
             #except (PermissionError, UnicodeDecodeError):
             except (PermissionError):
