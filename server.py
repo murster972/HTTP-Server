@@ -33,11 +33,6 @@ class HTTPServer:
             print("[-] Invalid sever IP address or port number.")
             sys.exit(-1)
 
-        self.valid_chars = [chr(i) for i in range(32, 127)]
-
-        #print(self.is_valid_uri("helo%61world"))
-        #exit()
-
         self.get_content_types()
 
         self.server_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -74,20 +69,19 @@ class HTTPServer:
 
             for i in t1: HTTPServer.content_types[i] = t[0]
 
-    def get_encoding(self):
-        pass
-
     'Translates any unicode chars to ascii in uri, currently only supports UTF-8'
     def uri_decoder(self, u):
         new_u = ""
         l_u = len(u)
+
+        valid_chars = [chr(i) for i in range(32, 127)]
 
         i = 0
         while i < l_u:
             if u[i] == "%":
                 if i + 2 > l_u: return -1
                 d = chr(int(u[i+1:i+3], 16))
-                if d not in sefl.valid_chars: return -1
+                if d not in valid_chars: return -1
                 new_u += d
                 i += 3
             else:
@@ -96,15 +90,14 @@ class HTTPServer:
 
         return new_u
 
-    'Checks if uri passed is valid'
-    def is_valid_uri(self, u):
-        #checks are chars are valid - no reserved chars in uri that arent encoded
-        v = re.sub("[^?#&]", self.valid_chars)
+    'Validates uri, checks invalid chars, converts uncidoe to ascii and removes backwards traversal attempts'
+    def validate_uri(self, u):
+        #checks for invalid characters
 
-        uri = self.uri_decoder(u)
-        if uri == -1: return -1
+        #converts any unicode to ascii
 
-        #remove any attempts of backwards traversal
+        #removes any attempt of backwards traversal
+        pass
 
 class ClientHandler(HTTPServer):
     def __init__(self, sock, addr):
@@ -117,14 +110,13 @@ class ClientHandler(HTTPServer):
                 #recieves client requets
                 req = sock.recv(HTTPServer.BUFF_SIZE).decode()
                 split_req = self.split_request(req)
-                connect_header = "Closed" if "Connecion" not in split_req[3] else split_req[3]["Connection"]
+                connect_header = "closed" if "connecion" not in split_req[3] else split_req[3]["connection"]
 
                 resp = self.handle_request(split_req)
 
                 sock.send(resp.encode())
 
-                #(connect_header)
-                if connect_header == "Closed": break
+                if connect_header == "closed": break
 
         except ConnectionResetError:
             print("[*] Client closed connection")
@@ -132,89 +124,32 @@ class ClientHandler(HTTPServer):
             sock.close()
 
     def handle_request(self, r):
-
         method, uri, http_ver, self.req_headers, body = tuple(r)
 
+        if method == "get" or method == "head":
+            uri = HTTPServer.is_valid_uri()
 
-        if method == "GET" or method == "HEAD":
-            try:
-                if uri[0] == "/": uri = uri[1:]
-
-                ext = uri.split(".")
-                #changes any unknown or invalid ext to txt
-                ext = "txt" if len(ext) == 0 or not ext[-1] else ext[-1]
-
-
-                #NOTE: Doesnt take into account file ext not being in text or binary files,
-                #      i.e. files not supported by server
-                r_opt = "r" if ext in HTTPServer.text_files else "rb"
-
-                f = open("{}/{}".format(HTTPServer.root_dir, uri), r_opt)
-
-                #NOTE: Problem will occur as different binary files use different encoding
-                #TODO: Find way to detect encoding
-                f_data = f.read()
-                headers = []
-
-                if r_opt == "rb":
-                    #NOTE: Trying to figure out how to compress font and send
-                    #f_data = base64.b64encode(f_data)
-                    #f_data = zlib.compress(f_data)
-
-                    #f_data = str(base64.b64encode(f_data))[2:-1]
-
-                    #NOTE: Does not check if client accepts gzip encoding yet
-
-                    #NOTE: Content-Encoding header causing font to fail
-                    headers.append("Accept-Ranges: bytes")
-                    #20248
-                    #headers.append("Content-Range: bytes 1/")
-                    #f_data = str(f_data)[2:-1
-                    f_data = f_data
-
-                f.close()
-
-                content_length = len(f_data)
-                #f_data = f_data if r_opt == "r" else str(f_data)[2:-1]
-
-                #NOTE: ONLY FOR TESTING PURPOSES
-                if ext not in HTTPServer.content_types: ext = "txt"
-                content_type = "content-type: {}".format(HTTPServer.content_types[ext])
-                content_length = "content-length: {}".format(content_length)
-
-                if "Connection" not in self.req_headers: connect = "Closed"
-                elif self.req_headers["Connection"] == "keep-alive": connect = "keep-alive"
-                else: connect = "Closed"
-                connect = "Connection: {}".format(connect)
-
-                headers += [content_type, content_length, connect]
-
-                #TODO: Change so http ver isnt hard coded
-                f_data = "" if method == "HEAD" else f_data
-                return self.gen_response("HTTP/1.1 200 OK", headers, f_data)
-
-            except FileNotFoundError:
-                r = ErrorStatusCodes.get_status_code_page(404)
-                return self.gen_response(r[0], r[1], r[2])
-            #except (PermissionError, UnicodeDecodeError):
-            except (PermissionError):
-                r = HTTPStatusCodes.gen_status_code_page(403)
+            if uri == -1:
+                r = status_codes.ErrorStatusCodes(400)
                 return self.gen_response(r[0], r[1], r[2])
 
-        elif method == "POST":
+
+        """elif method == "post":
             pass
-        elif method == "PUT":
+        elif method == "put":
             pass
-        elif method == "DELETE":
+        elif method == "delete":
             pass
-        elif method == "CONNECT":
+        elif method == "connect":
             pass
-        elif method == "OPTIONS":
+        elif method == "options":
             pass
-        elif  method == "TRACE":
-            pass
+        elif  method == "trace":
+            pass""""
+
         else:
-            print("SEND ERROR STATING INVALID STATUS METHOD")
+            r = status_codes.ErrorStatusCodes(405)
+            return self.gen_response(r[0], r[1], r[2])
 
     ' Generates HTTP Response '
     def gen_response(self, status_line, headers=[], body=""):
@@ -232,17 +167,13 @@ class ClientHandler(HTTPServer):
         req = r.split("\r\n")
         method, uri, http_ver = tuple(req[0].split())
 
-        #TODO: Ensure URI cannot be used to back track through directories
-        uri = uri.replace("../", "")
-        uri = uri if uri != "/" else "index.html"
-
         method = method.upper()
         headers = {}
 
         i = 1
         while req[i]:
             h = req[i].split(": ")
-            headers[h[0]] = h[1]
+            headers[h[0].lower()] = h[1].lower()
             i += 1
 
         body = req[i + 1:]
