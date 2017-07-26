@@ -19,7 +19,8 @@ from status_codes import ErrorStatusCodes
 class HTTPServer:
     clients = {}
     BUFF_SIZE = 2048
-    root_dir = "TestWebsite"
+    #root_dir = "TestWebsite"
+    root_dir = "/home/murster972/Documents/programming/python/HTTP Server/TestWebsite"
     server_name = "PythonHTTPServer"
     content_types = {}
     binary_files = []
@@ -93,11 +94,23 @@ class HTTPServer:
     'Validates uri, checks invalid chars, converts uncidoe to ascii and removes backwards traversal attempts'
     def validate_uri(self, u):
         #checks for invalid characters
+        r_exp = r"[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\-.\/%\\]"
+        uri = re.sub(r_exp, "", u)
+
+        if uri: return -1
+        else: uri = u
 
         #converts any unicode to ascii
+        uri = self.uri_decoder(uri)
 
         #removes any attempt of backwards traversal
-        pass
+        #TODO: Test this with attacks, and improve
+        uri = uri.replace("../", "")
+
+        root_dir = HTTPServer.root_dir
+        root_dir += "/" if uri[0] != "/" else ""
+
+        return "{}{}".format(root_dir, uri)
 
 class ClientHandler(HTTPServer):
     def __init__(self, sock, addr):
@@ -125,31 +138,49 @@ class ClientHandler(HTTPServer):
 
     def handle_request(self, r):
         method, uri, http_ver, self.req_headers, body = tuple(r)
+        print(method, uri, http_ver, self.req_headers, body)
 
-        if method == "get" or method == "head":
-            uri = HTTPServer.is_valid_uri()
+        uri = "/index.html" if uri == "/" or uri == "\\" else uri
 
-            if uri == -1:
-                r = status_codes.ErrorStatusCodes(400)
-                return self.gen_response(r[0], r[1], r[2])
+        if method == "GET" or method == "HEAD":
+            try:
+                uri = self.validate_uri(uri)
+                if uri == -1: raise HTTPBadRequest()
+
+                ext = uri.split(".")
+                ext = "text" if len(uri) < 2 else ext[-1].lower()
+
+                read_opt = "rb" if ext in HTTPServer.binary_files else "r"
+
+                f = open(uri, read_opt)
+                body = f.read()
+                f.close()
 
 
-        """elif method == "post":
-            pass
-        elif method == "put":
-            pass
-        elif method == "delete":
-            pass
-        elif method == "connect":
-            pass
-        elif method == "options":
-            pass
-        elif  method == "trace":
-            pass""""
-
+            except FileNotFoundError:
+                r = ErrorStatusCodes.get_status_code_page(404)
+            except PermissionError:
+                r = ErrorStatusCodes.get_status_code_page(405)
+            except HTTPBadRequest:
+                r = ErrorStatusCodes.get_status_code_page(400)
         else:
-            r = status_codes.ErrorStatusCodes(405)
-            return self.gen_response(r[0], r[1], r[2])
+            r = ErrorStatusCodes.get_status_code_page(405)
+
+        #elif method == "POST":
+        #    pass
+        #elif method == "PUT":
+        #    pass
+        #elif method == "DELETE":
+        #    pass
+        #elif method == "CONNECT":
+        #    pass
+        #elif method == "OPTIONS":
+        #    pass
+        #elif  method == "TRACE":
+        #    pass
+
+
+        return self.gen_response(r[0], r[1], r[2])
 
     ' Generates HTTP Response '
     def gen_response(self, status_line, headers=[], body=""):
@@ -166,6 +197,7 @@ class ClientHandler(HTTPServer):
     def split_request(self, r):
         req = r.split("\r\n")
         method, uri, http_ver = tuple(req[0].split())
+        method = method.upper()
 
         method = method.upper()
         headers = {}
@@ -179,6 +211,8 @@ class ClientHandler(HTTPServer):
         body = req[i + 1:]
 
         return [method, uri, http_ver, headers, body]
+
+class HTTPBadRequest(Exception): pass
 
 if __name__ == '__main__':
     HTTPServer()
