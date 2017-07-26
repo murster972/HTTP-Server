@@ -123,7 +123,7 @@ class ClientHandler(HTTPServer):
                 #
                 #      A shitty hack to ignore msg at end, need to figure out if msg is suppose to be
                 #      sent by client
-                print(req)
+                print(req, addr)
                 if len(req.split("\r\n")[0].split()) != 3: break
 
                 #print(req)
@@ -134,6 +134,7 @@ class ClientHandler(HTTPServer):
                 #req_response = self.handle_request(req).encode()
                 #sends result of Processed request to client
                 sock.send(resp.encode())
+                break
 
         except ConnectionResetError:
             print("[*] Client closed connection")
