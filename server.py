@@ -94,7 +94,8 @@ class HTTPServer:
     'Validates uri, checks invalid chars, converts uncidoe to ascii and removes backwards traversal attempts'
     def validate_uri(self, u):
         #checks for invalid characters
-        r_exp = r"[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\-.\/%\\]"
+        #r_exp = r"[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\-.\/%\\]"
+        r_exp = r"[a-zA-Z0-9_\-.\/%\\]"
         uri = re.sub(r_exp, "", u)
 
         if uri: return -1
@@ -138,7 +139,7 @@ class ClientHandler(HTTPServer):
 
     def handle_request(self, r):
         method, uri, http_ver, self.req_headers, body = tuple(r)
-        print(method, uri, http_ver, self.req_headers, body)
+        #print(method, uri, http_ver, self.req_headers, body)
 
         uri = "/index.html" if uri == "/" or uri == "\\" else uri
 
@@ -155,6 +156,7 @@ class ClientHandler(HTTPServer):
                 f = open(uri, read_opt)
                 body = f.read()
                 f.close()
+
 
 
             except FileNotFoundError:
@@ -186,8 +188,6 @@ class ClientHandler(HTTPServer):
     def gen_response(self, status_line, headers=[], body=""):
         resp = "{}\r\n".format(status_line)
         for i in headers: resp += str(i) + "\r\n"
-
-        print(resp)
 
         resp += "\r\n{}".format(body)
 
