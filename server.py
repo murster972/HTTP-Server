@@ -13,6 +13,8 @@ from status_codes import ErrorStatusCodes
 #      The problem may be with the font being in base64, try compressing
 #      with gzip first
 #NOTE: Server is someone sending the reply of the clients last request back to its self
+#NOTE: ^This is meant to happen after every response sent by tehs server the client send back a response
+#TODO: Check that this response(^see above) is recived from the client and if error try resending the response
 
 class HTTPServer:
     clients = {}
