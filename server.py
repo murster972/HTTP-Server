@@ -116,25 +116,15 @@ class ClientHandler(HTTPServer):
             while True:
                 #recieves client requets
                 req = sock.recv(HTTPServer.BUFF_SIZE).decode()
+                split_req = self.split_request(req)
+                connect_header = "Closed" if "Connecion" not in split_req[3] else split_req[3]["Connection"]
 
-                #NOTE: CLient is sedning back a msg to the server at the end witht the status code
-                #      of 200 if the client recueved everything ok and an error code if not,
-                #      shoudl this happen?, is the client suppose to send this msg at the end?
-                #
-                #      A shitty hack to ignore msg at end, need to figure out if msg is suppose to be
-                #      sent by client
-                print(req, addr)
-                if len(req.split("\r\n")[0].split()) != 3: break
+                resp = self.handle_request(split_req)
 
-                #print(req)
-                resp = self.handle_request(req)
-                if not resp:
-                    break
-
-                #req_response = self.handle_request(req).encode()
-                #sends result of Processed request to client
                 sock.send(resp.encode())
-                break
+
+                #(connect_header)
+                if connect_header == "Closed": break
 
         except ConnectionResetError:
             print("[*] Client closed connection")
@@ -142,25 +132,9 @@ class ClientHandler(HTTPServer):
             sock.close()
 
     def handle_request(self, r):
-        req = r.split("\r\n")
-        method, uri, http_ver = tuple(req[0].split())
 
-        #TODO: Ensure URI cannot be used to back track through directories
-        uri = uri.replace("../", "")
-        uri = uri if uri != "/" else "index.html"
+        method, uri, http_ver, self.req_headers, body = tuple(r)
 
-        method = method.upper()
-        headers = {}
-
-        i = 1
-        while req[i]:
-            h = req[i].split(": ")
-            headers[h[0]] = h[1]
-            i += 1
-
-        self.req_headers = headers
-
-        body = req[i + 1:]
 
         if method == "GET" or method == "HEAD":
             try:
@@ -207,8 +181,12 @@ class ClientHandler(HTTPServer):
                 if ext not in HTTPServer.content_types: ext = "txt"
                 content_type = "content-type: {}".format(HTTPServer.content_types[ext])
                 content_length = "content-length: {}".format(content_length)
-                #connect = "Connection: {}".format("Keep-alive" if self.req_headers["Connection"] == "keep-alive" else "Closed")
-                connect = "Connection: Closed"
+
+                if "Connection" not in self.req_headers: connect = "Closed"
+                elif self.req_headers["Connection"] == "keep-alive": connect = "keep-alive"
+                else: connect = "Closed"
+                connect = "Connection: {}".format(connect)
+
                 headers += [content_type, content_length, connect]
 
                 #TODO: Change so http ver isnt hard coded
@@ -248,6 +226,28 @@ class ClientHandler(HTTPServer):
         resp += "\r\n{}".format(body)
 
         return resp
+
+    'Splits request into, status line, uri, http protocol, headers and body'
+    def split_request(self, r):
+        req = r.split("\r\n")
+        method, uri, http_ver = tuple(req[0].split())
+
+        #TODO: Ensure URI cannot be used to back track through directories
+        uri = uri.replace("../", "")
+        uri = uri if uri != "/" else "index.html"
+
+        method = method.upper()
+        headers = {}
+
+        i = 1
+        while req[i]:
+            h = req[i].split(": ")
+            headers[h[0]] = h[1]
+            i += 1
+
+        body = req[i + 1:]
+
+        return [method, uri, http_ver, headers, body]
 
 if __name__ == '__main__':
     HTTPServer()
