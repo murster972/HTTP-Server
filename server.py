@@ -29,7 +29,7 @@ class HTTPServer:
     def __init__(self):
         try:
             #server_IP, server_port = input("Server IP: "), 443
-            server_IP, server_port = "", 80
+            server_IP, server_port = "127.0.0.1", 80
         except ValueError:
             print("[-] Invalid sever IP address or port number.")
             sys.exit(-1)
@@ -126,6 +126,8 @@ class ClientHandler(HTTPServer):
                 split_req = self.split_request(req)
                 connect_header = "closed" if "connecion" not in split_req[3] else split_req[3]["connection"]
 
+                split_req[3]["connection"] = connect_header
+
                 resp = self.handle_request(split_req)
 
                 sock.send(resp.encode())
@@ -138,7 +140,7 @@ class ClientHandler(HTTPServer):
             sock.close()
 
     def handle_request(self, r):
-        method, uri, http_ver, self.req_headers, body = tuple(r)
+        method, uri, http_ver, req_headers, body = tuple(r)
         #print(method, uri, http_ver, self.req_headers, body)
 
         uri = "/index.html" if uri == "/" or uri == "\\" else uri
@@ -157,6 +159,20 @@ class ClientHandler(HTTPServer):
                 body = f.read()
                 f.close()
 
+                content_len = "Content-Length: {}".format(len(body))
+
+                content_type = "text" if ext not in HTTPServer.content_types else HTTPServer.content_types[ext]
+                content_type = "Content-Type: " + content_type
+
+                connection = "Connection: " + req_headers["connection"].title()
+
+                if method == "GET" and read_opt == "rb":
+                    body = str(body)[1:-1]
+
+                elif method == "HEAD":
+                    body = ""
+
+                return self.gen_response("HTTP/1.1 200 OK", headers=[content_type, content_len, connection], body=body)
 
 
             except FileNotFoundError:
@@ -165,6 +181,9 @@ class ClientHandler(HTTPServer):
                 r = ErrorStatusCodes.get_status_code_page(405)
             except HTTPBadRequest:
                 r = ErrorStatusCodes.get_status_code_page(400)
+            except UnicodeDecodeError:
+                r = ErrorStatusCodes.get_status_code_page(500)
+
         else:
             r = ErrorStatusCodes.get_status_code_page(405)
 
@@ -188,6 +207,9 @@ class ClientHandler(HTTPServer):
     def gen_response(self, status_line, headers=[], body=""):
         resp = "{}\r\n".format(status_line)
         for i in headers: resp += str(i) + "\r\n"
+
+        print(resp)
+        input()
 
         resp += "\r\n{}".format(body)
 
