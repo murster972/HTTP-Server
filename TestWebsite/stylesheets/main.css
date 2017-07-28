@@ -3,11 +3,6 @@
     src: url("fonts/FiraSans-Light.ttf");
 }
 
-@font-face {
-    font-family: azz;
-    src: url("fonts/azz.otf");
-}
-
 body, p{
 	padding: 0;
 	margin: 0;

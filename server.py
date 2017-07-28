@@ -153,6 +153,7 @@ class ClientHandler(HTTPServer):
                 ext = uri.split(".")
                 ext = "text" if len(uri) < 2 else ext[-1].lower()
 
+                #BUG: Binary data is not being sent corretly
                 read_opt = "rb" if ext in HTTPServer.binary_files else "r"
 
                 f = open(uri, read_opt)
@@ -164,10 +165,13 @@ class ClientHandler(HTTPServer):
                 content_type = "text" if ext not in HTTPServer.content_types else HTTPServer.content_types[ext]
                 content_type = "Content-Type: " + content_type
 
-                connection = "Connection: " + req_headers["connection"].title()
+                #connection = "Connection: " + req_headers["connection"].title()
+                connection = "Connection: Keep-Alive"
 
+                #NOTE: Binary data is being read as a string instead of bytes by the client
+                #TODO: Find the correct way to send binary data
                 if method == "GET" and read_opt == "rb":
-                    body = str(body)[1:-1]
+                    pass
 
                 elif method == "HEAD":
                     body = ""
@@ -209,7 +213,6 @@ class ClientHandler(HTTPServer):
         for i in headers: resp += str(i) + "\r\n"
 
         print(resp)
-        input()
 
         resp += "\r\n{}".format(body)
 

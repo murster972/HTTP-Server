@@ -1,6 +1,6 @@
 #fonts
 font/collection::ttc
-application/x-font-opentype::otf,ttf
+application/font-sfnt::otf,ttf
 application/font-woff::woff
 application/font-woff2::woff2
 
@@ -11,3 +11,5 @@ text/css::css
 text/javascript::js
 
 #images
+image/jpeg::jpg,jpeg
+image/png::png
