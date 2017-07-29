@@ -3,18 +3,12 @@ import os
 import re
 import sys
 import socket
-import base64
 import zlib
 from threading import Thread
 from status_codes import ErrorStatusCodes
 
-#NOTE: Font files are sending but are not being decoded by browser
-#TODO: Fix this^ shit
-#      The problem may be with the font being in base64, try compressing
-#      with gzip first
-#NOTE: Server is someone sending the reply of the clients last request back to its self
-#NOTE: ^This is meant to happen after every response sent by tehs server the client send back a response
-#TODO: Check that this response(^see above) is recived from the client and if error try resending the response
+#NOTE: Binary files are being sent now, problem was they were being converted to strings then encoded again
+#      now there being sent just as byte streams
 
 class HTTPServer:
     clients = {}
@@ -94,7 +88,6 @@ class HTTPServer:
     'Validates uri, checks invalid chars, converts uncidoe to ascii and removes backwards traversal attempts'
     def validate_uri(self, u):
         #checks for invalid characters
-        #r_exp = r"[abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_\-.\/%\\]"
         r_exp = r"[a-zA-Z0-9_\-.\/%\\]"
         uri = re.sub(r_exp, "", u)
 
@@ -128,9 +121,14 @@ class ClientHandler(HTTPServer):
 
                 split_req[3]["connection"] = connect_header
 
-                resp = self.handle_request(split_req)
+                resp, body, r_opt = self.handle_request(split_req)
 
-                sock.send(resp.encode())
+                if r_opt == "rb" and type(body) is bytes:
+                    sock.send(resp.encode())
+                    sock.send(body)
+                else:
+                    resp += body
+                    sock.send(resp.encode())
 
                 if connect_header == "closed": break
 
@@ -153,7 +151,6 @@ class ClientHandler(HTTPServer):
                 ext = uri.split(".")
                 ext = "text" if len(uri) < 2 else ext[-1].lower()
 
-                #BUG: Binary data is not being sent corretly
                 read_opt = "rb" if ext in HTTPServer.binary_files else "r"
 
                 f = open(uri, read_opt)
@@ -165,18 +162,11 @@ class ClientHandler(HTTPServer):
                 content_type = "text" if ext not in HTTPServer.content_types else HTTPServer.content_types[ext]
                 content_type = "Content-Type: " + content_type
 
-                #connection = "Connection: " + req_headers["connection"].title()
-                connection = "Connection: Keep-Alive"
+                connection = "Connection: " + req_headers["connection"].title()
 
-                #NOTE: Binary data is being read as a string instead of bytes by the client
-                #TODO: Find the correct way to send binary data
-                if method == "GET" and read_opt == "rb":
-                    pass
+                if method == "HEAD": body = ""
 
-                elif method == "HEAD":
-                    body = ""
-
-                return self.gen_response("HTTP/1.1 200 OK", headers=[content_type, content_len, connection], body=body)
+                return (self.gen_response("HTTP/1.1 200 OK", headers=[content_type, content_len, connection]), body, read_opt)
 
 
             except FileNotFoundError:
@@ -205,7 +195,7 @@ class ClientHandler(HTTPServer):
         #    pass
 
 
-        return self.gen_response(r[0], r[1], r[2])
+        return (self.gen_response(r[0], r[1]), r[2], "r")
 
     ' Generates HTTP Response '
     def gen_response(self, status_line, headers=[], body=""):
@@ -214,7 +204,7 @@ class ClientHandler(HTTPServer):
 
         print(resp)
 
-        resp += "\r\n{}".format(body)
+        resp += "\r\n"
 
         return resp
 
@@ -224,7 +214,6 @@ class ClientHandler(HTTPServer):
         method, uri, http_ver = tuple(req[0].split())
         method = method.upper()
 
-        method = method.upper()
         headers = {}
 
         i = 1
